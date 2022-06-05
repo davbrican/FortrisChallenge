@@ -1,6 +1,7 @@
 <template>
   <div id="RPSchallenge">
     <div class="container" v-if="!logged">
+      <h1>{{formText}}</h1>
       <div class="form-group">
         <label for="InputEmail">Username</label>
         <input class="form-control" v-model="username" type="email" placeholder="Email" />
@@ -16,15 +17,41 @@
       <button v-if="!signup" @click="login()" type="submit" class="btn btn-primary">Submit</button>
       <button v-if="signup" @click="signUp()" type="submit" class="btn btn-primary">Submit</button>
       <br> <br>
-      <a @click="changeForm()">{{formButton}}</a>
+      <a @click="changeForm()" style="color: blue;text-decoration: underline blue; cursor: pointer;">{{formButton}}</a>
     </div>
 
-
+  
     <div class="container" v-if="logged">
-      <button @click="gameCheck('rock')">Rock</button>
-      <button @click="gameCheck('paper')">Paper</button>
-      <button @click="gameCheck('scissors')">Scissors</button>
+      <h1>Rock-Paper-Scissors</h1>
+      <p style="color: blue">Rock beats scissors, scissors beat paper, paper beats rock.</p>
+      <div class="instructions" v-if="!inGame">
+        <br>
+        <p style="margin-top: -15px;">Race to 5 wins. Bonus points for fewer matches to reach 5</p>
+        <p style="margin-top: -15px;">wins using the formula 10 - # of matches. If computer gets 5</p>
+        <p style="margin-top: -15px;">wins first, you get zero points.</p>
+        <br><br>
+        <p style="font-size: 22px;">Good luck, {{username}}</p>
+        <button @click="startGame()" class="btn btn-primary" style="background-color: green;">Start Game</button>
+      </div>
+      <div class="game" v-if="inGame">
+        <h2>Round #{{game_round}}</h2>
+        <p style="font-size: 25px;">Computer {{machineScores}} - {{scores}} {{username}}</p>
+        <p>Computer picks</p>
+        <p v-if="machineChoice == '?'"><img src="@/assets/qmark.jpeg"/></p>
+        <p v-if="machineChoice == 'rock'"><img src="@/assets/rock.jpeg"/></p>
+        <p v-if="machineChoice == 'paper'"><img src="@/assets/paper.jpeg"/></p>
+        <p v-if="machineChoice == 'scissors'"><img src="@/assets/scissors.jpeg"/></p>
+        <p>Pick your weapon</p>
+        <img @click="gameCheck('rock')" src="@/assets/rock.jpeg"/>
+        <img @click="gameCheck('paper')" src="@/assets/paper.jpeg"/>
+        <img @click="gameCheck('scissors')" src="@/assets/scissors.jpeg"/>
+      </div>
+      {{roundResult}}
+      <br><br>  
+      <button @click="logout()" class="btn btn-primary">Logout</button>
     </div>
+
+    
 
   </div>
 </template>
@@ -47,11 +74,31 @@ export default {
       logged: false,
       signup: false,
       formButton: "Sign up",
+      formText: "Log-in",
+      inGame: false,
+      machineChoice: "?",
+      roundResult: "",
     }
   },
   methods: {
+    startGame() {
+      this.inGame = true;
+    },
+    logout() {
+      this.logged = false;
+      this.username = "";
+      this.password = "";
+      this.repitPassword = "";
+      this.scores = 0;
+      this.machineScores = 0;
+      this.game_round = 1;
+      localStorage.removeItem('user');
+      localStorage.removeItem('password');
+      localStorage.removeItem('username');
+    },
     changeForm() {
       this.signup = !this.signup;
+      this.formText = this.signup ? "Sign up" : "Log-in";
       this.formButton = this.signup ? "Log in" : "Sign up";
     },
     signUp() {
@@ -114,6 +161,11 @@ export default {
       })
       .then(response => {
         console.log(response.data);
+        this.machineChoice = response.data.machine_choice;
+        this.game_round = response.data.game_round;
+        this.scores = response.data.user_scores;
+        this.machineScores = response.data.machine_scores;
+        this.roundResult = response.data.result;
       })
       .catch(error => {
         console.log(error);
@@ -128,7 +180,10 @@ export default {
 
 <style>
 .container {
-  margin-top: 200px;
+  margin-top: 2%;
   text-align: center;
+}
+img {
+  width: 5%;
 }
 </style>

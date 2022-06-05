@@ -33,8 +33,6 @@ def gameLogic(username, machine_scores, user_scores, user_choice, game_round):
     
     result = ""
     if machine_choice == user_choice:
-        machine_scores += 1
-        user_scores += 1
         result = "There is a draw in the round"
     else:
         if machine_choice == "rock":
@@ -169,10 +167,12 @@ def login():
     password = request.json['password']
     cur = mysql.connection.cursor()
     cur.execute("SELECT * FROM users WHERE username LIKE %s", (username,))
-    result = cur.fetchall()[0]
-    if (result[1] == password):
-        return jsonify({"username": result[0], "password": result[1], "scores": result[2], "matches": result[3], "response": "Login successful"}) 
-    
+    data = cur.fetchall()
+    if len(data) > 0:
+        result = data[0]
+        if (result[1] == password):
+            return jsonify({"username": result[0], "password": result[1], "scores": result[2], "matches": result[3], "response": "Login successful"}) 
+        
     return jsonify({"response": "Invalid username or password"})
 
 

@@ -59,24 +59,25 @@ def gameLogic(username, machine_scores, user_scores, user_choice, game_round):
                 user_scores += 1
                 result = username + " win!"
     
-    game_round += 1
+        game_round += 1
     
     cur = mysql.connection.cursor()
     cur.execute("SELECT * FROM users WHERE username LIKE %s", (username,))
     user_data = cur.fetchone()
     print(user_data, file=sys.stderr)
     if (machine_scores == 5):
-        result = "Computer wins the game!"
+        result = "Computer 5 - " + str(user_scores) + " " + username + "\nComputer wins the game!"
         machine_scores = 0
         user_scores = 0
         game_round = 1
         cur.execute('UPDATE users SET scores = %s, matches = %s WHERE username LIKE %s', (user_data[2], user_data[3] + 1, username))
     elif (user_scores == 5):
-        result = username + " win the game!"
+        earned_points = game_round - (machine_scores + user_scores)
+        result = "Computer " + str(machine_scores) + " - 5 " + username + "\n" + username + " wins the battle and earns " + str(earned_points) + " points\n" + username + " now has a total of " + str(earned_points+user_data[2])
         machine_scores = 0
         user_scores = 0
         game_round = 1
-        cur.execute('UPDATE users SET scores = %s, matches = %s WHERE username LIKE %s', (user_data[2] + 3, user_data[3] + 1, username))
+        cur.execute('UPDATE users SET scores = %s, matches = %s WHERE username LIKE %s', (earned_points+user_data[2], user_data[3] + 1, username))
     mysql.connection.commit()
     
     return {"result": result, "machine_scores": machine_scores, "user_scores": user_scores, "game_round": game_round, "machine_choice": machine_choice}
@@ -125,7 +126,7 @@ def getUser(username):
 @app.route('/leaderboard')
 def getLeaderboard():
     cur = mysql.connection.cursor()
-    cur.execute("SELECT * FROM users ORDER BY scores DESC LIMIT 3")
+    cur.execute("SELECT * FROM users WHERE matches >= 10 ORDER BY scores DESC ")
     data = cur.fetchall()
     result = []
     for i in data:

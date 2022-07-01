@@ -4,7 +4,9 @@ from fastapi import FastAPI
 from datetime import datetime, timedelta
 import pandas as pd                        
 from pytrends.request import TrendReq
+import xml.etree.ElementTree as ET
 import re
+import requests
 
 app = FastAPI()
 
@@ -67,7 +69,53 @@ def trends_search(phrase, start_date, end_date):
     else:
         return None
 
+def weather_search():
+    today = datetime.now()
+    resulting_dict = {}
+    for day_index in range(7):
+        d = today - timedelta(days=day_index)
+        key = "0e8b6d7ec08b49bbb8b85340220107"
+        uri = "http://api.weatherapi.com/v1/history.xml?key=" + key + "&q=Sevilla&dt=" + str(d.strftime("%Y-%m-%d"))
+        response = requests.get(uri).text
+        
+        tree = ET.fromstring(response)
+        location = tree[0]
+        forecastday = tree[1][0]
+        if "city" not in resulting_dict:
+            resulting_dict["city"] = location[0].text
+        if "days" not in resulting_dict:
+            resulting_dict["days"] = []
 
+        hourly_temperature = 0
+        hourly_pressure = 0
+        hourly_wind_speed = 0
+        hourly_humidity = 0
+        hourly_precipitation = 0
+        condition_history = []
+        hours = 0
+
+        for i in forecastday:
+            if i.tag == "hour":
+                hourly_temperature += float(i[2].text)
+                hourly_pressure += float(i[10].text)
+                hourly_wind_speed += float(i[7].text)
+                hourly_humidity += float(i[14].text)
+                hourly_precipitation += float(i[12].text)
+                conditions = i[5]
+                condition_history.append(conditions[0].text)
+                hours += 1
+                
+        hourly_temperature = round((hourly_temperature / hours), 2)
+        hourly_pressure = round((hourly_pressure / hours), 2)
+        hourly_wind_speed = round((hourly_wind_speed / hours), 2)
+        hourly_humidity = round((hourly_humidity / hours), 2)
+        hourly_precipitation = round((hourly_precipitation / hours), 2)
+
+
+        day = forecastday[0].text
+
+        resulting_dict["days"].append({day: {"temperature": hourly_temperature, "pressure": hourly_pressure, "wind": hourly_wind_speed, "precipitations": hourly_precipitation, "humidity": hourly_humidity, "condition_history": condition_history}})
+    return resulting_dict
 
 @app.get("/")
 async def root():
@@ -96,3 +144,7 @@ async def trends(phrase: str = "", start_date: str = "", end_date: str = ""):
         return result
     else:
         return {"error": "A phrase is required or dates are badformed (Correct way: YYYY-mm-dd)"}
+    
+@app.get("/weather")
+async def weather():
+    return {"weather": weather_search()}

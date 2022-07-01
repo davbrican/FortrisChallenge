@@ -4,3 +4,4 @@ datetime
 pytrends
 urllib3
 pandas
+requests

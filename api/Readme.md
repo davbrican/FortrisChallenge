@@ -35,3 +35,6 @@ Example: http://API_URL/weather
 >Returns the climate in your location and a phrase given trends in the last 7 days
 
 Example: http://API_URL/trends_weather?phrase=hello%20world
+
+### TESTS
+To run all the tests run the command "pytest ./test.py" into the folder ./api

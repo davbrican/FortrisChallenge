@@ -10,6 +10,7 @@ import requests
 import geocoder
 import os
 
+
 app = FastAPI()
 
 pytrend = TrendReq()
@@ -147,7 +148,7 @@ async def life_expectancy(sex: str, race: str, year: str):
 async def unemployment(state: str):
     result_dict = unemployment_search()
     if state in result_dict:
-        return {"rate": result_dict[state]}
+        return {"rate": float(result_dict[state])}
     else:
         return {"error": "State not found"}
 

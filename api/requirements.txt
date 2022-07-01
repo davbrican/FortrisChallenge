@@ -7,3 +7,4 @@ pandas
 requests
 geocoder
 bs4
+pytest

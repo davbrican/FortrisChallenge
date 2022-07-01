@@ -2,11 +2,16 @@ import urllib.request, json
 from bs4 import BeautifulSoup
 from fastapi import FastAPI
 from datetime import datetime, timedelta
+import pandas as pd                        
 from pytrends.request import TrendReq
 
 app = FastAPI()
 
-pytrends = TrendReq()
+from pytrends.request import TrendReq
+
+# Only need to run this once, the rest of requests will use the same session.
+pytrend = TrendReq()
+
 
 
 def main_search(sex, race, year):
@@ -55,8 +60,17 @@ async def trends(phrase: str = "", start_date: str = "", end_date: str = ""):
     today = datetime.now()    
     n_days_ago = today - timedelta(days=N_DAYS_AGO)
     if start_date == "": start_date = n_days_ago
+    else: start_date = datetime.strptime(start_date, "%Y-%m-%d")
     if end_date == "": end_date = today
+    else: end_date = datetime.strptime(end_date, "%Y-%m-%d")
+        
     if phrase != "":
-        return {"interest": pytrends.get_historical_interest(phrase.replace(",","").split(" "), year_start=2018, month_start=1, day_start=1, hour_start=0, year_end=2018, month_end=2, day_end=1, hour_end=0, cat=0, geo='', gprop='', sleep=0)}
+        kw_list=[phrase]
+        time_frame = ''
+        regiondf = pytrend.get_historical_interest(kw_list, year_start=start_date.year, month_start=start_date.month, day_start=start_date.day, hour_start=0, year_end=end_date.year, month_end=end_date.month, day_end=end_date.day, hour_end=0, cat=0, geo='', gprop='', sleep=0)
+        result = []
+        for index, row in regiondf.iterrows():
+            result.append(int(row[0]))
+        return {"interest": result}
     else:
         return {"error": "A phrase is required"}

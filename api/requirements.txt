@@ -3,3 +3,4 @@ uvicorn[standard]
 datetime
 pytrends
 urllib3
+pandas

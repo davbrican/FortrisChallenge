@@ -5,3 +5,5 @@ pytrends
 urllib3
 pandas
 requests
+geocoder
+bs4

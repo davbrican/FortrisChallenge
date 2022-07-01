@@ -7,7 +7,7 @@ services:
       args:
         buildno: 1
      ports:
-       - "5000:8000"
+       - "8000:8000"
      restart: always
      environment:
-       TEST: test
+       TOKEN: 0e8b6d7ec08b49bbb8b85340220107

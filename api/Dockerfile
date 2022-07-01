@@ -7,4 +7,4 @@ RUN apt-get install -y build-essential
 RUN apt-get -y install default-libmysqlclient-dev
 RUN pip3 install -r requirements.txt
 COPY . .
-CMD [ "python3", "-m" , "uvicorn", "main:app", "--reload"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]

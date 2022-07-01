@@ -1,0 +1,5 @@
+fastapi
+uvicorn[standard]
+datetime
+pytrends
+urllib3

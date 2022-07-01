@@ -11,7 +11,7 @@ This is an API to get a great sort of information about different kind of data
 -race: Including just "Black", "White" and "All"
 -year: Where the year must be 1900 <= year <= 2018
 
-Example: http://API_URL/life_expectancy/Male/White/1800
+Example: http://API_URL/life_expectancy/Male/White/2010
 
 **_/unemployment/{state}_**
 >A rate value of the unemployment of the specified state from USA

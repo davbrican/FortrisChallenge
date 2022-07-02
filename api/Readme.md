@@ -1,5 +1,10 @@
 # Python Challenge API
-This is an API to get a great sort of information about different kind of data
+This is an API to get a great sort of information about different kind of data.
+
+The API can be run on docker just from the root folder with the command "docker-compose up -d" or by running:
+- cd api 
+- pip install -r requirements.txt
+- uvicorn main:app --reload
 
 ### GETTERS
 **_/_**

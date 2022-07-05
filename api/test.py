@@ -53,3 +53,8 @@ def test_trends_bad_dates_formation():
     response = client.get("/trends?phrase=hello world&start_date=17/06/2022&end_date=01/07/2022")
     assert response.status_code == 200
     assert response.json() == {"error": "A phrase is required or dates are badformed (Correct way: YYYY-mm-dd)"}
+    
+def test_trends_weather_without_phrase():
+    response = client.get("/trends")
+    assert response.status_code == 200
+    assert response.json() == {"error": "A phrase is required"}

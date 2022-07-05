@@ -35,7 +35,7 @@ def test_unemployment():
     assert response.json() == {"rate": 14.9}
 
 def test_life_expectancy_no_data():
-    response = client.get("/unemployment/Madrid")
+    response = client.get("/unemployment/Not a State")
     assert response.status_code == 200
     assert response.json() == {"error": "State not found"}
 

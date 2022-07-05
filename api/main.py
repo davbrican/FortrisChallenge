@@ -32,9 +32,12 @@ def life_expectancy_search(sex, race, year):
         uri += "&sex=" + sex.replace(" ", "%20")
     if year:
         uri += "&year=" + year
-    with urllib.request.urlopen(uri) as url:
-        data = json.loads(url.read().decode())
-        return data
+    try:
+        with urllib.request.urlopen(uri) as url:
+            data = json.loads(url.read().decode())
+            return data
+    except:
+        return None
 
 def unemployment_search():
     uri = "https://www.bls.gov/web/laus/lauhsthl.htm"
@@ -109,7 +112,7 @@ async def root():
 async def life_expectancy(sex: str, race: str, year: str):
     search = life_expectancy_search(sex, race, year)
     if search == None:
-        return {"error": "Sex or Race are not included in the available ones"}
+        return {"error": "Sex or Race are not included in the available ones, or year is not well formed"}
     try:
         return {"average_life_expectancy": float(search[0]["average_life_expectancy"])}
     except:
